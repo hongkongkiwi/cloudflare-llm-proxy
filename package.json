@@ -1,0 +1,45 @@
+{
+  "name": "cloudflare-llm-proxy",
+  "version": "1.0.0",
+  "description": "A secure Anthropic API proxy for Cloudflare Workers",
+  "main": "src/index.ts",
+  "scripts": {
+    "dev": "wrangler dev",
+    "dev:local": "tsx src/local-server.ts",
+    "start": "tsx src/local-server.ts",
+    "deploy": "wrangler deploy",
+    "deploy:staging": "wrangler deploy --env staging",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:run": "vitest run",
+    "test:coverage": "vitest run --coverage",
+    "test:ui": "vitest --ui",
+    "test:simple": "node test/run-tests.js",
+    "test:sdks": "vitest run test/sdk/",
+    "example:local": "node examples/local-usage.js"
+  },
+  "keywords": [
+    "cloudflare",
+    "workers",
+    "anthropic",
+    "api",
+    "proxy"
+  ],
+  "author": "",
+  "license": "ISC",
+  "packageManager": "pnpm@10.12.4",
+  "devDependencies": {
+    "@anthropic-ai/sdk": "^0.57.0",
+    "@cloudflare/workers-types": "^4.20241218.0",
+    "@dotenvx/dotenvx": "^1.48.3",
+    "@google/generative-ai": "^0.24.1",
+    "@types/node": "^20.0.0",
+    "@vitest/coverage-v8": "^1.0.0",
+    "groq-sdk": "^0.29.0",
+    "openai": "^5.10.2",
+    "tsx": "^4.20.3",
+    "typescript": "^5.0.0",
+    "vitest": "^1.0.0",
+    "wrangler": "^3.0.0"
+  }
+}
