@@ -1,13 +1,13 @@
-name = "claude-proxy"
+name = "llm-proxy"
 main = "src/index.ts"
 compatibility_date = "2024-01-01"
 compatibility_flags = ["nodejs_compat"]
 
 [env.production]
-name = "claude-proxy"
+name = "llm-proxy"
 
 [env.staging]
-name = "claude-proxy-staging"
+name = "llm-proxy-staging"
 
 [env.production.vars]
 ALLOWED_ANTHROPIC_KEYS = ""
