@@ -82,10 +82,11 @@ describe('Google Gemini API Unit Tests', () => {
       
       // Verify the request properties
       const mockCall = mockFetch.mock.calls[0];
-      const mockRequest = mockCall[0];
-      expect(mockRequest.url).toBe('https://generativelanguage.googleapis.com/v1/generateContent');
-      expect(mockRequest.method).toBe('POST');
-      expect(mockRequest.headers.get('x-goog-api-key')).toBe('client-key-1');
+      const callUrl = mockCall[0];
+      const callOptions = mockCall[1];
+      expect(callUrl).toBe('https://generativelanguage.googleapis.com/v1/generateContent');
+      expect(callOptions.method).toBe('POST');
+      expect(callOptions.headers instanceof Headers ? callOptions.headers.get('x-goog-api-key') : callOptions.headers['x-goog-api-key']).toBe('client-key-1');
     });
 
     it('should route Gemini models endpoint correctly', async () => {
@@ -136,10 +137,11 @@ describe('Google Gemini API Unit Tests', () => {
       
       // Verify the request properties
       const mockCall = mockFetch.mock.calls[0];
-      const mockRequest = mockCall[0];
-      expect(mockRequest.url).toBe('https://generativelanguage.googleapis.com/v1/models');
-      expect(mockRequest.method).toBe('GET');
-      expect(mockRequest.headers.get('x-goog-api-key')).toBe('client-key-1');
+      const callUrl = mockCall[0];
+      const callOptions = mockCall[1];
+      expect(callUrl).toBe('https://generativelanguage.googleapis.com/v1/models');
+      expect(callOptions.method).toBe('GET');
+      expect(callOptions.headers instanceof Headers ? callOptions.headers.get('x-goog-api-key') : callOptions.headers['x-goog-api-key']).toBe('client-key-1');
     });
   });
 
@@ -198,10 +200,11 @@ describe('Google Gemini API Unit Tests', () => {
       
       // Verify the request properties
       const mockCall = mockFetch.mock.calls[0];
-      const mockRequest = mockCall[0];
-      expect(mockRequest.url).toBe('https://generativelanguage.googleapis.com/v1/generateContent');
-      expect(mockRequest.method).toBe('POST');
-      expect(mockRequest.headers.get('x-goog-api-key')).toBe('client-key-1');
+      const callUrl = mockCall[0];
+      const callOptions = mockCall[1];
+      expect(callUrl).toBe('https://generativelanguage.googleapis.com/v1/generateContent');
+      expect(callOptions.method).toBe('POST');
+      expect(callOptions.headers instanceof Headers ? callOptions.headers.get('x-goog-api-key') : callOptions.headers['x-goog-api-key']).toBe('client-key-1');
     });
 
     it('should handle Gemini streaming responses', async () => {

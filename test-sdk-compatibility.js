@@ -2,7 +2,7 @@
 
 const { OpenAI } = require('openai');
 const Anthropic = require('@anthropic-ai/sdk');
-const { GoogleGenerativeAI } = require('@google/generative-ai');
+const { GoogleGenAI } = require('@google/genai');
 const Groq = require('groq-sdk');
 
 const BASE_URL = 'http://localhost:3001';
@@ -76,14 +76,21 @@ async function testGroq() {
 async function testGemini() {
   console.log('\n🧪 Testing Google Generative AI SDK...');
   
-  const genAI = new GoogleGenerativeAI('client-key-1');
+  const genAI = new GoogleGenAI({
+    apiKey: 'client-key-1',
+    httpOptions: {
+      baseUrl: `${BASE_URL}/gemini`,
+    },
+  });
   
   try {
-    const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
-    const result = await model.generateContent('Say hello!');
+    const result = await genAI.models.generateContent({
+      model: 'gemini-2.5-flash',
+      contents: [{ parts: [{ text: 'Say hello!' }] }],
+    });
     
     console.log('✅ Google Generative AI SDK test passed');
-    console.log('Response:', result.response.text());
+    console.log('Response:', result.candidates[0].content.parts[0].text);
   } catch (error) {
     console.log('❌ Google Generative AI SDK test failed:', error.message);
   }

@@ -61,10 +61,11 @@ describe('Anthropic API Unit Tests', () => {
       
       // Verify the request properties
       const mockCall = mockFetch.mock.calls[0];
-      const mockRequest = mockCall[0];
-      expect(mockRequest.url).toBe('https://api.anthropic.com/v1/messages');
-      expect(mockRequest.method).toBe('POST');
-      expect(mockRequest.headers.get('x-api-key')).toBe('client-key-1');
+      const callUrl = mockCall[0];
+      const callOptions = mockCall[1];
+      expect(callUrl).toBe('https://api.anthropic.com/v1/messages');
+      expect(callOptions.method).toBe('POST');
+      expect(callOptions.headers instanceof Headers ? callOptions.headers.get('x-api-key') : callOptions.headers['x-api-key']).toBe('client-key-1');
     });
 
     it('should route Anthropic models endpoint correctly', async () => {
@@ -111,10 +112,11 @@ describe('Anthropic API Unit Tests', () => {
       
       // Verify the request properties
       const mockCall = mockFetch.mock.calls[0];
-      const mockRequest = mockCall[0];
-      expect(mockRequest.url).toBe('https://api.anthropic.com/v1/models');
-      expect(mockRequest.method).toBe('GET');
-      expect(mockRequest.headers.get('x-api-key')).toBe('client-key-1');
+      const callUrl = mockCall[0];
+      const callOptions = mockCall[1];
+      expect(callUrl).toBe('https://api.anthropic.com/v1/models');
+      expect(callOptions.method).toBe('GET');
+      expect(callOptions.headers instanceof Headers ? callOptions.headers.get('x-api-key') : callOptions.headers['x-api-key']).toBe('client-key-1');
     });
   });
 
@@ -153,8 +155,9 @@ describe('Anthropic API Unit Tests', () => {
       // Verify the request properties
       const mockCall = mockFetch.mock.calls[0];
       const mockRequest = mockCall[0];
-      expect(mockRequest.headers.get('anthropic-version')).toBe('2023-06-01');
-      expect(mockRequest.headers.get('anthropic-beta')).toBe('tools-2024-04-04');
+      const callOptions = mockCall[1];
+      expect(callOptions.headers instanceof Headers ? callOptions.headers.get('anthropic-version') : callOptions.headers['anthropic-version']).toBe('2023-06-01');
+      expect(callOptions.headers instanceof Headers ? callOptions.headers.get('anthropic-beta') : callOptions.headers['anthropic-beta']).toBe('tools-2024-04-04');
     });
 
     it('should handle Anthropic streaming responses', async () => {

@@ -27,6 +27,7 @@ describe('Groq SDK Compatibility Tests', () => {
     groq = new Groq({
       apiKey: 'client-key-1',
       baseURL: 'http://localhost:3000/groq',
+      dangerouslyAllowBrowser: true,
     });
   });
 
@@ -221,6 +222,7 @@ describe('Groq SDK Compatibility Tests', () => {
       const invalidGroq = new Groq({
         apiKey: 'invalid-key',
         baseURL: 'http://localhost:3000/groq',
+        dangerouslyAllowBrowser: true,
       });
 
       try {

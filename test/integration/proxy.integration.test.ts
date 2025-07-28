@@ -76,12 +76,13 @@ describe('Multi-AI API Proxy Integration Tests', () => {
       
       // Verify the request properties
       const mockCall = mockFetch.mock.calls[0];
-      const mockRequest = mockCall[0];
-      expect(mockRequest.url).toBe('https://api.anthropic.com/v1/messages');
-      expect(mockRequest.method).toBe('POST');
-      expect(mockRequest.headers.get('x-api-key')).toBe('client-key-1');
-      expect(mockRequest.headers.get('anthropic-version')).toBe('2023-06-01');
-      expect(mockRequest.headers.get('content-type')).toBe('application/json');
+      const callUrl = mockCall[0];
+      const callOptions = mockCall[1];
+      expect(callUrl).toBe('https://api.anthropic.com/v1/messages');
+      expect(callOptions.method).toBe('POST');
+      expect(callOptions.headers instanceof Headers ? callOptions.headers.get('x-api-key') : callOptions.headers['x-api-key']).toBe('client-key-1');
+      expect(callOptions.headers instanceof Headers ? callOptions.headers.get('anthropic-version') : callOptions.headers['anthropic-version']).toBe('2023-06-01');
+      expect(callOptions.headers instanceof Headers ? callOptions.headers.get('content-type') : callOptions.headers['content-type']).toBe('application/json');
     });
 
     it('should handle Anthropic models endpoint correctly', async () => {
@@ -184,12 +185,13 @@ describe('Multi-AI API Proxy Integration Tests', () => {
       
       // Verify the request properties
       const mockCall = mockFetch.mock.calls[0];
-      const mockRequest = mockCall[0];
-      expect(mockRequest.url).toBe('https://api.openai.com/v1/chat/completions');
-      expect(mockRequest.method).toBe('POST');
-      expect(mockRequest.headers.get('Authorization')).toBe('Bearer client-key-1');
-      expect(mockRequest.headers.get('openai-version')).toBe('2024-01-01');
-      expect(mockRequest.headers.get('content-type')).toBe('application/json');
+      const callUrl = mockCall[0];
+      const callOptions = mockCall[1];
+      expect(callUrl).toBe('https://api.openai.com/v1/chat/completions');
+      expect(callOptions.method).toBe('POST');
+      expect(callOptions.headers instanceof Headers ? callOptions.headers.get('Authorization') : callOptions.headers['Authorization']).toBe('Bearer client-key-1');
+      expect(callOptions.headers instanceof Headers ? callOptions.headers.get('openai-version') : callOptions.headers['openai-version']).toBe('2024-01-01');
+      expect(callOptions.headers instanceof Headers ? callOptions.headers.get('content-type') : callOptions.headers['content-type']).toBe('application/json');
     });
 
     it('should handle OpenAI streaming responses correctly', async () => {
@@ -299,11 +301,12 @@ describe('Multi-AI API Proxy Integration Tests', () => {
       
       // Verify the request properties
       const mockCall = mockFetch.mock.calls[0];
-      const mockRequest = mockCall[0];
-      expect(mockRequest.url).toBe('https://api.groq.com/v1/chat/completions');
-      expect(mockRequest.method).toBe('POST');
-      expect(mockRequest.headers.get('Authorization')).toBe('Bearer client-key-1');
-      expect(mockRequest.headers.get('content-type')).toBe('application/json');
+      const callUrl = mockCall[0];
+      const callOptions = mockCall[1];
+      expect(callUrl).toBe('https://api.groq.com/v1/chat/completions');
+      expect(callOptions.method).toBe('POST');
+      expect(callOptions.headers instanceof Headers ? callOptions.headers.get('Authorization') : callOptions.headers['Authorization']).toBe('Bearer client-key-1');
+      expect(callOptions.headers instanceof Headers ? callOptions.headers.get('content-type') : callOptions.headers['content-type']).toBe('application/json');
     });
 
     it('should handle Groq models endpoint correctly', async () => {
@@ -399,11 +402,12 @@ describe('Multi-AI API Proxy Integration Tests', () => {
       
       // Verify the request properties
       const mockCall = mockFetch.mock.calls[0];
-      const mockRequest = mockCall[0];
-      expect(mockRequest.url).toBe('https://generativelanguage.googleapis.com/v1/chat/completions');
-      expect(mockRequest.method).toBe('POST');
-      expect(mockRequest.headers.get('x-goog-api-key')).toBe('client-key-1');
-      expect(mockRequest.headers.get('content-type')).toBe('application/json');
+      const callUrl = mockCall[0];
+      const callOptions = mockCall[1];
+      expect(callUrl).toBe('https://generativelanguage.googleapis.com/v1/chat/completions');
+      expect(callOptions.method).toBe('POST');
+      expect(callOptions.headers instanceof Headers ? callOptions.headers.get('x-goog-api-key') : callOptions.headers['x-goog-api-key']).toBe('client-key-1');
+      expect(callOptions.headers instanceof Headers ? callOptions.headers.get('content-type') : callOptions.headers['content-type']).toBe('application/json');
     });
   });
 
@@ -462,11 +466,12 @@ describe('Multi-AI API Proxy Integration Tests', () => {
       
       // Verify the request properties
       const mockCall = mockFetch.mock.calls[0];
-      const mockRequest = mockCall[0];
-      expect(mockRequest.url).toBe('https://us-central1-aiplatform.googleapis.com/v1/projects/completions/locations/us-central1/publishers/google/models/gemini-pro:predict');
-      expect(mockRequest.method).toBe('POST');
-      expect(mockRequest.headers.get('authorization')).toBe('Bearer client-key-1');
-      expect(mockRequest.headers.get('content-type')).toBe('application/json');
+      const callUrl = mockCall[0];
+      const callOptions = mockCall[1];
+      expect(callUrl).toBe('https://us-central1-aiplatform.googleapis.com/v1/projects/completions/locations/us-central1/publishers/google/models/gemini-pro:predict');
+      expect(callOptions.method).toBe('POST');
+      expect(callOptions.headers instanceof Headers ? callOptions.headers.get('authorization') : callOptions.headers['authorization']).toBe('Bearer client-key-1');
+      expect(callOptions.headers instanceof Headers ? callOptions.headers.get('content-type') : callOptions.headers['content-type']).toBe('application/json');
     });
   });
 
@@ -527,7 +532,9 @@ describe('Multi-AI API Proxy Integration Tests', () => {
       await workerHandler.fetch(request, mockEnv, {});
 
       // Verify that all client IP and location headers are masked
-      const forwardedRequest = mockFetch.mock.calls[0][0];
+      const mockCall = mockFetch.mock.calls[0];
+      const callUrl = mockCall[0];
+      const callOptions = mockCall[1];
       const maskedHeaders = [
         'X-Forwarded-For', 'X-Real-IP', 'CF-Connecting-IP', 'CF-IPCountry',
         'CF-Ray', 'CF-Visitor', 'X-Forwarded-Proto', 'X-Forwarded-Host',
@@ -540,12 +547,12 @@ describe('Multi-AI API Proxy Integration Tests', () => {
       ];
 
       maskedHeaders.forEach(header => {
-        expect(forwardedRequest.headers.get(header)).toBeNull();
+        expect(callOptions.headers instanceof Headers ? callOptions.headers.get(header) : callOptions.headers[header]).toBeNull();
       });
 
       // Verify that essential headers are preserved
-      expect(forwardedRequest.headers.get('Content-Type')).toBe('application/json');
-      expect(forwardedRequest.headers.get('x-api-key')).toBe('client-key-1');
+      expect(callOptions.headers instanceof Headers ? callOptions.headers.get('Content-Type') : callOptions.headers['Content-Type']).toBe('application/json');
+      expect(callOptions.headers instanceof Headers ? callOptions.headers.get('x-api-key') : callOptions.headers['x-api-key']).toBe('client-key-1');
     });
 
     it('should set generic user agent when none provided', async () => {
@@ -574,8 +581,10 @@ describe('Multi-AI API Proxy Integration Tests', () => {
 
       await workerHandler.fetch(request, mockEnv, {});
 
-      const forwardedRequest = mockFetch.mock.calls[0][0];
-      expect(forwardedRequest.headers.get('User-Agent')).toBe('Claude-Proxy/1.0');
+      const mockCall = mockFetch.mock.calls[0];
+      const callUrl = mockCall[0];
+      const callOptions = mockCall[1];
+              expect(callOptions.headers instanceof Headers ? callOptions.headers.get('User-Agent') : callOptions.headers['User-Agent']).toBe('Claude-Proxy/1.0');
     });
 
     it('should preserve existing user agent when provided', async () => {
@@ -604,8 +613,10 @@ describe('Multi-AI API Proxy Integration Tests', () => {
 
       await workerHandler.fetch(request, mockEnv, {});
 
-      const forwardedRequest = mockFetch.mock.calls[0][0];
-      expect(forwardedRequest.headers.get('User-Agent')).toBe('Custom-Client/2.0');
+      const mockCall = mockFetch.mock.calls[0];
+      const callUrl = mockCall[0];
+      const callOptions = mockCall[1];
+              expect(callOptions.headers instanceof Headers ? callOptions.headers.get('User-Agent') : callOptions.headers['User-Agent']).toBe('Custom-Client/2.0');
     });
   });
 
@@ -707,8 +718,25 @@ describe('Multi-AI API Proxy Integration Tests', () => {
       expect(response.status).toBe(200);
       
       // Verify the large body was forwarded correctly
-      const forwardedRequest = mockFetch.mock.calls[0][0];
-      const forwardedBody = await forwardedRequest.text();
+      const mockCall = mockFetch.mock.calls[0];
+      const callUrl = mockCall[0];
+      const callOptions = mockCall[1];
+      let forwardedBody = callOptions.body;
+      if (forwardedBody && typeof forwardedBody === 'object' && 'getReader' in forwardedBody) {
+        // It's a ReadableStream
+        const reader = forwardedBody.getReader();
+        let chunks = '';
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          chunks += new TextDecoder().decode(value);
+        }
+        forwardedBody = chunks;
+      } else if (Array.isArray(forwardedBody)) {
+        forwardedBody = forwardedBody.join('');
+      } else if (typeof forwardedBody !== 'string') {
+        forwardedBody = String(forwardedBody);
+      }
       expect(forwardedBody).toContain(largeMessage);
     });
   });

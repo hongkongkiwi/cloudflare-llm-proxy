@@ -80,10 +80,11 @@ describe('Groq API Unit Tests', () => {
       
       // Verify the request properties
       const mockCall = mockFetch.mock.calls[0];
-      const mockRequest = mockCall[0];
-      expect(mockRequest.url).toBe('https://api.groq.com/v1/chat/completions');
-      expect(mockRequest.method).toBe('POST');
-      expect(mockRequest.headers.get('authorization')).toBe('Bearer client-key-1');
+      const callUrl = mockCall[0];
+      const callOptions = mockCall[1];
+      expect(callUrl).toBe('https://api.groq.com/v1/chat/completions');
+      expect(callOptions.method).toBe('POST');
+      expect(callOptions.headers instanceof Headers ? callOptions.headers.get('authorization') : callOptions.headers['authorization']).toBe('Bearer client-key-1');
     });
 
     it('should route Groq models endpoint correctly', async () => {

@@ -27,6 +27,7 @@ describe('OpenAI SDK Compatibility Tests', () => {
     openai = new OpenAI({
       apiKey: 'client-key-1',
       baseURL: 'http://localhost:3000/openai',
+      dangerouslyAllowBrowser: true,
     });
   });
 
@@ -216,6 +217,7 @@ describe('OpenAI SDK Compatibility Tests', () => {
       const invalidOpenAI = new OpenAI({
         apiKey: 'invalid-key',
         baseURL: 'http://localhost:3000/openai',
+        dangerouslyAllowBrowser: true,
       });
 
       try {

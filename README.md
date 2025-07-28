@@ -234,7 +234,7 @@ The project includes comprehensive SDK compatibility tests to ensure the proxy w
 
 - **Anthropic SDK** (`test/sdk/anthropic-sdk.test.ts`): Tests compatibility with `@anthropic-ai/sdk`
 - **OpenAI SDK** (`test/sdk/openai-sdk.test.ts`): Tests compatibility with `openai` package
-- **Google Generative AI SDK** (`test/sdk/gemini-sdk.test.ts`): Tests compatibility with `@google/generative-ai`
+- **Google Generative AI SDK** (`test/sdk/gemini-sdk.test.ts`): Tests compatibility with `@google/genai` (new SDK)
 - **Groq SDK** (`test/sdk/groq-sdk.test.ts`): Tests compatibility with `groq-sdk`
 
 ### Running SDK Tests
@@ -267,7 +267,7 @@ The following SDKs are installed as dev dependencies for testing:
 ```json
 {
   "@anthropic-ai/sdk": "^0.57.0",
-  "@google/generative-ai": "^0.24.1", 
+  "@google/genai": "^1.11.0",
   "groq-sdk": "^0.29.0",
   "openai": "^5.10.2"
 }

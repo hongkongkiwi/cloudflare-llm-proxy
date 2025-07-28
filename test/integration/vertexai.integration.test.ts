@@ -87,11 +87,12 @@ describe('Google Vertex AI API Integration Tests', () => {
       
       // Verify the request properties
       const mockCall = mockFetch.mock.calls[0];
-      const mockRequest = mockCall[0];
-      expect(mockRequest.url).toBe('https://us-central1-aiplatform.googleapis.com/v1/projects/123456789/locations/us-central1/publishers/google/models/gemini-pro:predict');
-      expect(mockRequest.method).toBe('POST');
-      expect(mockRequest.headers.get('authorization')).toBe('Bearer client-key-1');
-      expect(mockRequest.headers.get('content-type')).toBe('application/json');
+      const callUrl = mockCall[0];
+      const callOptions = mockCall[1];
+      expect(callUrl).toBe('https://us-central1-aiplatform.googleapis.com/v1/projects/123456789/locations/us-central1/publishers/google/models/gemini-pro:predict');
+      expect(callOptions.method).toBe('POST');
+      expect(callOptions.headers instanceof Headers ? callOptions.headers.get('authorization') : callOptions.headers['authorization']).toBe('Bearer client-key-1');
+      expect(callOptions.headers instanceof Headers ? callOptions.headers.get('content-type') : callOptions.headers['content-type']).toBe('application/json');
     });
 
     it('should handle Vertex AI models endpoint correctly', async () => {
@@ -142,10 +143,11 @@ describe('Google Vertex AI API Integration Tests', () => {
       
       // Verify the request properties
       const mockCall = mockFetch.mock.calls[0];
-      const mockRequest = mockCall[0];
-      expect(mockRequest.url).toBe('https://us-central1-aiplatform.googleapis.com/v1/projects/123456789/locations/us-central1/models');
-      expect(mockRequest.method).toBe('GET');
-      expect(mockRequest.headers.get('authorization')).toBe('Bearer client-key-1');
+      const callUrl = mockCall[0];
+      const callOptions = mockCall[1];
+      expect(callUrl).toBe('https://us-central1-aiplatform.googleapis.com/v1/projects/123456789/locations/us-central1/models');
+      expect(callOptions.method).toBe('GET');
+      expect(callOptions.headers instanceof Headers ? callOptions.headers.get('authorization') : callOptions.headers['authorization']).toBe('Bearer client-key-1');
     });
 
     it('should handle Vertex AI streaming responses', async () => {

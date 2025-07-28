@@ -27,6 +27,7 @@ describe('Anthropic SDK Compatibility Tests', () => {
     anthropic = new Anthropic({
       apiKey: 'client-key-1',
       baseURL: 'http://localhost:3000/anthropic',
+      dangerouslyAllowBrowser: true,
     });
   });
 
@@ -168,6 +169,7 @@ describe('Anthropic SDK Compatibility Tests', () => {
       const invalidAnthropic = new Anthropic({
         apiKey: 'invalid-key',
         baseURL: 'http://localhost:3000/anthropic',
+        dangerouslyAllowBrowser: true,
       });
 
       try {

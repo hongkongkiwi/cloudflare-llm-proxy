@@ -156,17 +156,18 @@ describe('Multi-AI API Proxy Unit Tests', () => {
       await workerHandler.fetch(request, mockEnv, {});
 
       // Verify that the forwarded request doesn't contain client IP headers
-      const forwardedRequest = mockFetch.mock.calls[0][0];
-      expect(forwardedRequest.headers.get('X-Forwarded-For')).toBeNull();
-      expect(forwardedRequest.headers.get('X-Real-IP')).toBeNull();
-      expect(forwardedRequest.headers.get('CF-Connecting-IP')).toBeNull();
-      expect(forwardedRequest.headers.get('CF-IPCountry')).toBeNull();
-      expect(forwardedRequest.headers.get('CF-Ray')).toBeNull();
+      const callUrl = mockFetch.mock.calls[0][0];
+      const callOptions = mockFetch.mock.calls[0][1];
+      expect(callOptions.headers instanceof Headers ? callOptions.headers.get('X-Forwarded-For') : callOptions.headers['X-Forwarded-For']).toBeNull();
+      expect(callOptions.headers instanceof Headers ? callOptions.headers.get('X-Real-IP') : callOptions.headers['X-Real-IP']).toBeNull();
+      expect(callOptions.headers instanceof Headers ? callOptions.headers.get('CF-Connecting-IP') : callOptions.headers['CF-Connecting-IP']).toBeNull();
+      expect(callOptions.headers instanceof Headers ? callOptions.headers.get('CF-IPCountry') : callOptions.headers['CF-IPCountry']).toBeNull();
+      expect(callOptions.headers instanceof Headers ? callOptions.headers.get('CF-Ray') : callOptions.headers['CF-Ray']).toBeNull();
       
       // Verify that content-type and other relevant headers are preserved
-      expect(forwardedRequest.headers.get('Content-Type')).toBe('application/json');
-      expect(forwardedRequest.headers.get('anthropic-version')).toBe('2023-06-01');
-      expect(forwardedRequest.headers.get('x-api-key')).toBe('client-key-1');
+      expect(callOptions.headers instanceof Headers ? callOptions.headers.get('Content-Type') : callOptions.headers['Content-Type']).toBe('application/json');
+      expect(callOptions.headers instanceof Headers ? callOptions.headers.get('anthropic-version') : callOptions.headers['anthropic-version']).toBe('2023-06-01');
+      expect(callOptions.headers instanceof Headers ? callOptions.headers.get('x-api-key') : callOptions.headers['x-api-key']).toBe('client-key-1');
     });
 
     it('should set generic user agent when none provided', async () => {
@@ -197,8 +198,9 @@ describe('Multi-AI API Proxy Unit Tests', () => {
 
       await workerHandler.fetch(request, mockEnv, {});
 
-      const forwardedRequest = mockFetch.mock.calls[0][0];
-      expect(forwardedRequest.headers.get('User-Agent')).toBe('Claude-Proxy/1.0');
+      const callUrl = mockFetch.mock.calls[0][0];
+      const callOptions = mockFetch.mock.calls[0][1];
+      expect(callOptions.headers instanceof Headers ? callOptions.headers.get('User-Agent') : callOptions.headers['User-Agent']).toBe('Claude-Proxy/1.0');
     });
 
     it('should preserve existing user agent when provided', async () => {
@@ -230,8 +232,9 @@ describe('Multi-AI API Proxy Unit Tests', () => {
 
       await workerHandler.fetch(request, mockEnv, {});
 
-      const forwardedRequest = mockFetch.mock.calls[0][0];
-      expect(forwardedRequest.headers.get('User-Agent')).toBe('Custom-Client/1.0');
+      const callUrl = mockFetch.mock.calls[0][0];
+      const callOptions = mockFetch.mock.calls[0][1];
+      expect(callOptions.headers instanceof Headers ? callOptions.headers.get('User-Agent') : callOptions.headers['User-Agent']).toBe('Custom-Client/1.0');
     });
   });
 
@@ -340,9 +343,10 @@ describe('Multi-AI API Proxy Unit Tests', () => {
       
       // Verify the request properties
       const mockCall = mockFetch.mock.calls[0];
-      const mockRequest = mockCall[0];
-      expect(mockRequest.url).toBe('https://api.anthropic.com/v1/messages?param=value&test=123');
-      expect(mockRequest.method).toBe('POST');
+      const callUrl = mockCall[0];
+      const callOptions = mockCall[1];
+      expect(callUrl).toBe('https://api.anthropic.com/v1/messages?param=value&test=123');
+      expect(callOptions.method).toBe('POST');
     });
 
     it('should set default version when not provided', async () => {
@@ -377,7 +381,8 @@ describe('Multi-AI API Proxy Unit Tests', () => {
       // Verify the request properties
       const mockCall = mockFetch.mock.calls[0];
       const mockRequest = mockCall[0];
-      expect(mockRequest.headers.get('anthropic-version')).toBe('2023-06-01');
+      const callOptions = mockCall[1];
+      expect(callOptions.headers instanceof Headers ? callOptions.headers.get('anthropic-version') : callOptions.headers['anthropic-version']).toBe('2023-06-01');
     });
 
     it('should forward response with CORS headers', async () => {
@@ -506,9 +511,10 @@ describe('Multi-AI API Proxy Unit Tests', () => {
       
       // Verify the request properties
       const mockCall = mockFetch.mock.calls[0];
-      const mockRequest = mockCall[0];
-      expect(mockRequest.url).toBe('https://api.anthropic.com/v1/models');
-      expect(mockRequest.method).toBe('GET');
+      const callUrl = mockCall[0];
+      const callOptions = mockCall[1];
+      expect(callUrl).toBe('https://api.anthropic.com/v1/models');
+      expect(callOptions.method).toBe('GET');
     });
 
     it('should handle HEAD requests', async () => {
@@ -533,28 +539,83 @@ describe('Multi-AI API Proxy Unit Tests', () => {
       
       // Verify the request properties
       const mockCall = mockFetch.mock.calls[0];
-      const mockRequest = mockCall[0];
-      expect(mockRequest.url).toBe('https://api.anthropic.com/v1/models');
-      expect(mockRequest.method).toBe('HEAD');
+      const callUrl = mockCall[0];
+      const callOptions = mockCall[1];
+      expect(callUrl).toBe('https://api.anthropic.com/v1/models');
+      expect(callOptions.method).toBe('HEAD');
     });
   });
 
   describe('Proxy Configuration', () => {
     it('should use proxy when PROXY_URL is set', async () => {
-      console.log('Starting proxy test');
-      console.log('Test environment:', process.env.NODE_ENV);
-      
-      // First, let's test if the proxy functionality exists
-      expect(workerHandler.fetchWithProxy).toBeDefined();
-      console.log('fetchWithProxy method exists');
-      
-      const mockEnv = {
+      // Mock fetch with happy-dom environment
+      const mockFetch = vi.fn();
+      globalThis.fetch = mockFetch;
+
+      const proxyMockEnv = {
         ALLOWED_ANTHROPIC_KEYS: 'client-key-1',
         ALLOWED_OPENAI_KEYS: 'client-key-1',
         ALLOWED_GOOGLE_KEYS: 'client-key-1',
         ALLOWED_GROQ_KEYS: 'client-key-1',
         ALLOWED_OPENROUTER_KEYS: 'client-key-1',
         PROXY_URL: 'https://proxy.example.com:8080',
+      };
+
+      mockFetch.mockResolvedValueOnce(new Response(JSON.stringify({
+        id: 'test123',
+        content: 'Response',
+      }), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' },
+      }));
+
+      const request = new Request('https://example.com/openai/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer client-key-1',
+        },
+        body: JSON.stringify({
+          model: 'gpt-3.5-turbo',
+          max_tokens: 100,
+          messages: [{ role: 'user', content: 'Hello' }],
+        }),
+      });
+
+      await workerHandler.fetch(request, proxyMockEnv, {});
+
+      // Verify that the request was forwarded through the proxy
+      expect(mockFetch).toHaveBeenCalled();
+      
+      const mockCall = mockFetch.mock.calls[0];
+      const callUrl = mockCall[0];
+      const callOptions = mockCall[1];
+      const headers = callOptions.headers;
+      
+      expect(callUrl).toBe('https://proxy.example.com:8080/');
+      expect(callOptions.method).toBe('POST');
+      
+      // Headers might be a Headers object, so we need to check differently
+      if (headers instanceof Headers) {
+        expect(headers.get('X-Target-URL')).toBe('https://api.openai.com/v1/chat/completions');
+        expect(headers.get('Content-Type')).toBe('application/json');
+        expect(headers.get('authorization')).toBe('Bearer client-key-1');
+      } else {
+        expect(headers['X-Target-URL']).toBe('https://api.openai.com/v1/chat/completions');
+        expect(headers['Content-Type']).toBe('application/json');
+        expect(headers['authorization']).toBe('Bearer client-key-1');
+      }
+    });
+
+    it('should not use proxy when PROXY_URL is not set', async () => {
+      global.fetch = mockFetch; // Ensure fetch is mocked for this test
+      const mockEnv = {
+        ALLOWED_ANTHROPIC_KEYS: 'client-key-1',
+        ALLOWED_OPENAI_KEYS: 'client-key-1',
+        ALLOWED_GOOGLE_KEYS: 'client-key-1',
+        ALLOWED_GROQ_KEYS: 'client-key-1',
+        ALLOWED_OPENROUTER_KEYS: 'client-key-1',
+        PROXY_URL: undefined, // Explicitly set to undefined
       };
 
       // Mock successful API response
@@ -571,6 +632,7 @@ describe('Multi-AI API Proxy Unit Tests', () => {
         headers: {
           'Content-Type': 'application/json',
           'X-API-Key': 'client-key-1',
+          'anthropic-version': '2023-06-01',
         },
         body: JSON.stringify({
           model: 'claude-3-sonnet-20240229',
@@ -580,82 +642,31 @@ describe('Multi-AI API Proxy Unit Tests', () => {
       });
 
       const response = await workerHandler.fetch(request, mockEnv, {});
-
-      // Debug: Check if the request was processed successfully
-      console.log('Response status:', response.status);
+      
+      // Debug: Check if the request was successful
       if (response.status !== 200) {
-        const responseText = await response.text();
-        console.error('Request failed:', response.status, responseText);
-      } else {
-        console.log('Request succeeded');
+        const errorData = await response.json();
+        console.log('Request failed:', response.status, errorData);
       }
 
-      // Debug: Check if mockFetch was called
-      console.log('mockFetch called times:', mockFetch.mock.calls.length);
+      // Debug: Check if mock was called
+      console.log('Mock calls:', mockFetch.mock.calls.length);
       if (mockFetch.mock.calls.length > 0) {
-        console.log('First mockFetch call:', mockFetch.mock.calls[0]);
+        console.log('First mock call:', mockFetch.mock.calls[0]);
       }
-
-      // Verify that the request was forwarded through the proxy
-      expect(mockFetch).toHaveBeenCalled();
-      
-      const mockCall = mockFetch.mock.calls[0];
-      const mockRequest = mockCall[0];
-      
-      // Verify the proxy request properties
-      expect(mockRequest.url).toBe('https://proxy.example.com:8080');
-      expect(mockRequest.method).toBe('POST');
-      expect(mockRequest.headers.get('X-Target-URL')).toBe('https://api.anthropic.com/v1/messages');
-      expect(mockRequest.headers.get('Content-Type')).toBe('application/json');
-      expect(mockRequest.headers.get('X-API-Key')).toBe('client-key-1');
-    });
-
-    it('should not use proxy when PROXY_URL is not set', async () => {
-      const mockEnv = {
-        ALLOWED_ANTHROPIC_KEYS: 'client-key-1',
-        ALLOWED_OPENAI_KEYS: 'client-key-1',
-        ALLOWED_GOOGLE_KEYS: 'client-key-1',
-        ALLOWED_GROQ_KEYS: 'client-key-1',
-        ALLOWED_OPENROUTER_KEYS: 'client-key-1',
-        // PROXY_URL is not set
-      };
-
-      // Mock successful API response
-      mockFetch.mockResolvedValueOnce(new Response(JSON.stringify({
-        id: 'test123',
-        content: 'Response',
-      }), {
-        status: 200,
-        headers: { 'Content-Type': 'application/json' },
-      }));
-
-      const request = new Request('https://example.com/anthropic/v1/messages', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-API-Key': 'client-key-1',
-        },
-        body: JSON.stringify({
-          model: 'claude-3-sonnet-20240229',
-          max_tokens: 100,
-          messages: [{ role: 'user', content: 'Hello' }],
-        }),
-      });
-
-      await workerHandler.fetch(request, mockEnv, {});
 
       // Verify that the request was forwarded directly (not through proxy)
       expect(mockFetch).toHaveBeenCalled();
       
-      const mockCall = mockFetch.mock.calls[0];
-      const mockRequest = mockCall[0];
-      
       // Verify the direct request properties
-      expect(mockRequest.url).toBe('https://api.anthropic.com/v1/messages');
-      expect(mockRequest.method).toBe('POST');
-      expect(mockRequest.headers.get('X-Target-URL')).toBeNull(); // No proxy header
-      expect(mockRequest.headers.get('Content-Type')).toBe('application/json');
-      expect(mockRequest.headers.get('X-API-Key')).toBe('client-key-1');
+      const directMockCall = mockFetch.mock.calls[0];
+      const callUrl = directMockCall[0];
+      const callOptions = directMockCall[1];
+      expect(callUrl).toBe('https://api.anthropic.com/v1/messages');
+      expect(callOptions.method).toBe('POST');
+      expect(callOptions.headers instanceof Headers ? callOptions.headers.get('X-Target-URL') : callOptions.headers['X-Target-URL']).toBeNull(); // No proxy header
+      expect(callOptions.headers instanceof Headers ? callOptions.headers.get('Content-Type') : callOptions.headers['Content-Type']).toBe('application/json');
+      expect(callOptions.headers instanceof Headers ? callOptions.headers.get('x-api-key') : callOptions.headers['x-api-key']).toBe('client-key-1');
     });
   });
 }); 

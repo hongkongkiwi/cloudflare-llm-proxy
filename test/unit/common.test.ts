@@ -199,11 +199,12 @@ describe('Common Functionality Unit Tests', () => {
       // Verify the request properties
       const mockCall = mockFetch.mock.calls[0];
       const mockRequest = mockCall[0];
-      expect(mockRequest.headers.get('x-forwarded-for')).toBeNull();
-      expect(mockRequest.headers.get('x-real-ip')).toBeNull();
-      expect(mockRequest.headers.get('cf-connecting-ip')).toBeNull();
-      expect(mockRequest.headers.get('cf-ipcountry')).toBeNull();
-      expect(mockRequest.headers.get('cf-ray')).toBeNull();
+      const callOptions = mockCall[1];
+      expect(callOptions.headers instanceof Headers ? callOptions.headers.get('x-forwarded-for') : callOptions.headers['x-forwarded-for']).toBeNull();
+      expect(callOptions.headers instanceof Headers ? callOptions.headers.get('x-real-ip') : callOptions.headers['x-real-ip']).toBeNull();
+      expect(callOptions.headers instanceof Headers ? callOptions.headers.get('cf-connecting-ip') : callOptions.headers['cf-connecting-ip']).toBeNull();
+      expect(callOptions.headers instanceof Headers ? callOptions.headers.get('cf-ipcountry') : callOptions.headers['cf-ipcountry']).toBeNull();
+      expect(callOptions.headers instanceof Headers ? callOptions.headers.get('cf-ray') : callOptions.headers['cf-ray']).toBeNull();
     });
 
     it('should set generic user agent if none provided', async () => {
@@ -240,7 +241,8 @@ describe('Common Functionality Unit Tests', () => {
       // Verify the request properties
       const mockCall = mockFetch.mock.calls[0];
       const mockRequest = mockCall[0];
-      expect(mockRequest.headers.get('user-agent')).toBe('Claude-Proxy/1.0');
+      const callOptions = mockCall[1];
+      expect(callOptions.headers instanceof Headers ? callOptions.headers.get('user-agent') : callOptions.headers['user-agent']).toBe('Claude-Proxy/1.0');
     });
 
     it('should preserve existing user agent', async () => {
@@ -278,7 +280,8 @@ describe('Common Functionality Unit Tests', () => {
       // Verify the request properties
       const mockCall = mockFetch.mock.calls[0];
       const mockRequest = mockCall[0];
-      expect(mockRequest.headers.get('user-agent')).toBe('MyApp/1.0');
+      const callOptions = mockCall[1];
+      expect(callOptions.headers instanceof Headers ? callOptions.headers.get('user-agent') : callOptions.headers['user-agent']).toBe('MyApp/1.0');
     });
   });
 
@@ -349,9 +352,10 @@ describe('Common Functionality Unit Tests', () => {
       
       // Verify the request properties
       const mockCall = mockFetch.mock.calls[0];
-      const mockRequest = mockCall[0];
-      expect(mockRequest.method).toBe('GET');
-      expect(mockRequest.url).toBe('https://api.anthropic.com/v1/models');
+      const callUrl = mockCall[0];
+      const callOptions = mockCall[1];
+      expect(callOptions.method).toBe('GET');
+      expect(callUrl).toBe('https://api.anthropic.com/v1/models');
     });
 
     it('should forward POST requests correctly', async () => {
@@ -385,9 +389,10 @@ describe('Common Functionality Unit Tests', () => {
       
       // Verify the request properties
       const mockCall = mockFetch.mock.calls[0];
-      const mockRequest = mockCall[0];
-      expect(mockRequest.method).toBe('POST');
-      expect(mockRequest.url).toBe('https://api.anthropic.com/v1/messages');
+      const callUrl = mockCall[0];
+      const callOptions = mockCall[1];
+      expect(callOptions.method).toBe('POST');
+      expect(callUrl).toBe('https://api.anthropic.com/v1/messages');
     });
   });
 }); 

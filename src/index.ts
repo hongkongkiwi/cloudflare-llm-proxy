@@ -1,3 +1,5 @@
+// Remove the makeRequest function and use global fetch directly
+
 interface Env {
   // Client authentication whitelists
   ALLOWED_ANTHROPIC_KEYS: string;
@@ -99,8 +101,8 @@ export default {
 
       // Get the client API key from request headers (optimized)
       const clientApiKey = request.headers.get('X-API-Key') || 
+                          request.headers.get('x-api-key') ||
                           request.headers.get('Authorization')?.replace(BEARER_PREFIX, '');
-      
       if (!clientApiKey) {
         return new Response(JSON.stringify({ 
           error: 'API key is required',
@@ -116,7 +118,6 @@ export default {
 
       // Parse the URL to determine which API to route to (optimized)
       const urlPathParts = url.pathname.split('/').filter(Boolean);
-      
       if (urlPathParts.length < 2) {
         return new Response(JSON.stringify({ 
           error: 'Invalid API endpoint',
@@ -129,10 +130,8 @@ export default {
           },
         });
       }
-
       const apiProvider = urlPathParts[0];
       const apiConfig = this.getApiConfig(apiProvider, env);
-
       if (!apiConfig) {
         return new Response(JSON.stringify({ 
           error: 'Unsupported API provider',
@@ -398,10 +397,18 @@ export default {
         body: request.body,
       });
       
-      return fetch(proxyRequest, ctx);
+      return fetch(proxyRequest.url, {
+        method: proxyRequest.method,
+        headers: proxyRequest.headers,
+        body: proxyRequest.body,
+      });
     } else {
       // Use regular fetch without proxy
-      return fetch(request, ctx);
+      return fetch(request.url, {
+        method: request.method,
+        headers: request.headers,
+        body: request.body,
+      });
     }
   },
 
