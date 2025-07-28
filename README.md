@@ -32,6 +32,8 @@ The proxy validates client API keys against provider-specific whitelists and for
 | Claude-Gemini (Translation) | `/claude-gemini/v1/messages` | (translates Claude API to Gemini) |
 | OpenRouter | `/openrouter/v1/chat/completions`, `/openrouter/v1/models` | `https://openrouter.ai/api/v1` |
 
+📖 **For detailed endpoint documentation, see [ENDPOINTS.md](ENDPOINTS.md)**
+
 ## Quick Start
 
 ### Local Development

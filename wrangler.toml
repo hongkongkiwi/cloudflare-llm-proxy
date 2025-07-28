@@ -2,25 +2,3 @@ name = "llm-proxy"
 main = "src/index.ts"
 compatibility_date = "2024-01-01"
 compatibility_flags = ["nodejs_compat"]
-
-[env.production]
-name = "llm-proxy"
-
-[env.staging]
-name = "llm-proxy-staging"
-
-[env.production.vars]
-ALLOWED_ANTHROPIC_KEYS = ""
-ALLOWED_OPENAI_KEYS = ""
-ALLOWED_GOOGLE_KEYS = ""
-ALLOWED_GROQ_KEYS = ""
-ALLOWED_OPENROUTER_KEYS = ""
-PROXY_URL = ""
-
-[env.staging.vars]
-ALLOWED_ANTHROPIC_KEYS = ""
-ALLOWED_OPENAI_KEYS = ""
-ALLOWED_GOOGLE_KEYS = ""
-ALLOWED_GROQ_KEYS = ""
-ALLOWED_OPENROUTER_KEYS = ""
-PROXY_URL = "" 
